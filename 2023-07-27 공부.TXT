@@ -1,0 +1,45 @@
+SQL 커맨드
+SELECT - 데이터베이스 데이터 추출
+UPDATE - 데이터베이스 데이터 업데이트
+DELETE - 데이터베이스 데이터 삭제
+INSERT INTO - 새로운 데이터를 데이터베이스로 삽입
+CREATE DATABASE - 새로운 데이터베이스 만듦
+ALTER DATABASE - 데이터 베이스 수정
+CREATE TABLE - 새로운 테이블 생성
+ALTER TABLE - 테이블 수정
+DROP TABLE - 테이블 삭제
+CREATE INDEX - 인덱스 생성
+DROP INDEX - 인덱스 삭제
+
+
+MySQL SELECT
+SELECT (찾고자 하는 열, 전체이면 *) FROM 테이블 이름
+
+DISTINCT -> 찾고자 할때 중복값은 반환받지 않는다
+=> SELECT DISTINCT (찾고자 하는 열) FROM 테이블 이름
+
+번외: COUNT(찾고자 하는 열) -> 열의 데이터 개수 반환
+COUNT(DINTINCT 찾고자 하는 열) -> 중복값 제외하고 열의 데이터 개수 반환
+
+MYSQL WHERE
+SELECT (찾고자 하는 열) FROM (테이블 이름) WHERE 조건
+-> 일반적인 프로그래밍 언어의 IF와 비슷하다고 생각하면 된다
+-> UPDATE와 DELETE에서도 사용된다
+
+텍스트일 경우 '텍스트' 이런식으로 묶어준다
+숫자일경우 ''필요없이 그냥 쓰면 된다
+사용 예제
+SELECT * FROM Customers WHERE Country = 'Mexico';
+
+WHERE에서 사용되는 것들
+=
+>
+<
+>=
+<=
+<> -> 같지 않다의 의미 -> NOT (조건 열)과 같다
+BETWEEN -> BETWEEN 50 AND 60 -> 50과 60도 포함
+LIKE -> WHERE City LIKE 's%'; -> s로 시작하는것들 -> 이 부분은 와일드카드 공부할 때 자세히 다룰 것임
+IN -> 구체적인 값이 있는 열을 가져옴 -> WHERE City IN('Paris','London')
+
+
