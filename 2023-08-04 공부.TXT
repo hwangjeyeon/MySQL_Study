@@ -1,0 +1,140 @@
+MYSQL Joins
+두 테이블 간에 공통된 부분으로 조회하는 방식
+사용예:
+SELECT 찾고자하는 테이블의 열(Orders.ID,Customer.ID)
+FROM 테이블1
+INNER JOINS 테이블2 ON Orders.customerID = Customers.CustomerID;
+
+MYSQL Joins 종류
+INNER JOIN: 교집합
+LEFT JOIN: 그냥 왼쪽테이블
+RIGHT JOIN: 그냥 오른쪽 테이블
+CROSS JOIN: 합집합
+
+MYSQL INNER JOIN
+SELECT 찾는 열 FROM 테이블1 
+INNER JOIN 테이블2 ON 테이블1.열 = 테이블2.열
+
+=> INNER JOIN은 공통된 부분 없으면 값이 나오지 않는다
+
+테이블 3개 JOIN
+SELECT 찾는테이블1.열, 찾는테이블2.열, 찾는테이블3.열
+FROM ((테이블1
+INNER JOIN 테이블2 ON 테이블1.열 = 테이블2.열)
+INNER JOIN 테이블3 ON 테이블1.열 = 테이블3.열)
+-> 1과 2가 매칭되는 부분과 1과 3이 매칭되는 부분이 달라도 매칭되는 테이블만 있으면 상관없다
+
+MYSQL LEFT JOIN
+두 테이블이 조인할때 왼쪽 테이블의 모든 내용만 조회할 수 있다
+SELECT 찾는 열 FROM 테이블1 
+LEFT JOIN 테이블2 ON 테이블1.열 = 테이블2.열
+
+MYSQL RIGHT JOIN
+두 테이블이 조인할때 오른쪽 테이블의 모든 내용만 조회할 수 있다
+SELECT 찾는 열 FROM 테이블1 
+RIGHT JOIN 테이블2 ON 테이블1.열 = 테이블2.열
+
+=> LEFT JOIN의 조회 기준이 되는 테이블은 FROM 테이블, RIGHT JOIN의 조회 기준이 되는 테이블은 RIGHT JOIN 테이블
+
+MYSQL CROSS JOIN
+두 테이블 모두 조회
+SELECT 찾는 열 FROM 테이블1 CROSS 테이블2
+-> 따라서 잠재적으로 정말 많은 결과 값을 리턴할 수 있다
+
+MYSQL SELF JOIN
+말그대로 자기자신 테이블을 다시한번 조인한다
+SELECT 찾는 열 FROM 테이블1 별명1, 테이블2 별명2
+WHERE 조건
+
+MYSQL UNION 
+조회 결과로 나온 결과를 합치는 것
+조건:
+- 상위 SQL문과 하위 SQL문의 컬럼 개수가 동일해야 합니다.
+-> SELECT한 문이 상위 SQL은 2개인데 하위 SQL은 1개인 경우는 조회되지 않는다
+- 상위 SQL문과 하위 SQL문의 컬럼 위치가 동일한 컬럼들이 결합이 됩니다.
+- 컬럼명은 최상위 SQL문의 명칭을 따르게 됩니다.
+-> 최상위 SQL의 AS가 붙으면 AS명칭을 따르고 그 아래 SQL에 AS가 붙으면 따르지 않는다
+
+UNION 예시
+SELECT 열 FROM 테이블1
+UNION
+SELECT 열 FROM 테이블 2
+-> DISTINCT가 되어서 중복 값은 조회되지 않는다
+
+UNION ALL 예시
+SELECT 열 FROM 테이블1
+UNION ALL
+SELECT 열 FROM 테이블2
+-> DISTINCT하지 않고 모든 값을 조회한다
+
+
+MYSQL GROUP BY
+- 같은 값을 가지고 있는 열끼리 묶은 방식
+- COUNT(), MAX(), MIN(), SUM(), AVG()와 같은 함수와 같이 사용한다
+SELECT 찾는 열 FROM 테이블 WHERE 조건 GROUP BY 열 ORDER BY 열;
+- JOIN과도 함꼐 사용할 수 있다
+
+
+MYSQL HAVING
+GROUP의 WHERE절 역할
+SELECT 찾는 열 FROM 테이블 WHERE 조건 GROUP BY 열 HAVING 조건 ORDER BY 열
+- JOIN된 테이블을 기준으로 HAVING 조건을 할 수 있다
+
+
+MYSQL EXISTS
+값이 있는지 없는지 조회한다 하나이상 있으면 TRUE를 리턴한다
+SELECT 찾는 열 FROM 테이블 WHERE EXISTS (SELECT 열 FROM 테이블 WHERE 조건)
+
+
+MYSQL ANY, ALL
+ANY:
+- 불 값을 결과로 리턴한다
+- 어떤 조건에 해당하는 값을 받으면 TRUE를 리턴한다
+SELECT 열 FROM 테이블 WHERE 열 (=,<>,!=,>,>=,<,<=) ANY (SELECT 열 FROM 테이블 WHERE 조건
+
+ALL:
+- 불 값을 결과로 리턴한다
+- 어떤 조건에 해당하는 값을 받으면 TRUE를 리턴한다
+- SELECT, WHERE, HAVING과 같이 쓰인다
+SELECT ALL 열 FROM 테이블 WHERE 조건
+SELECT 열 FROM 테이블 WHERE 열 (=,<>,!=,>,>=,<,<=) ALL (SELECT 열 FROM 테이블 WHERE);
+
+둘의 조건
+ANY는 조건이 하나라도 맞는게 있으면 맞는 값들을 다 TRUE로 리턴하나
+ALL은 조건이 맞지 않는게 하나라도 있으면 다른 맞는 모든 값들도 모두 FALSE로 리턴한다
+
+
+MYSQL INSERT SELECT
+INSERT INTO SELECT -> 복사된 데이터를 다른 테이블에 삽입한다
+삽입이라 대상 테이블의 값에 영향을 미치지 않는다
+INSERT INTO 테이블2 SELECT * FROM 테이블1 WHERE 조건
+INSERT INTO 테이블 2 (열1, 열2, 열3) SELECT 열1, 열2, 열3 FROM 테이블1 WHERE 조건
+
+MYSQL CASE
+SWITCH문 생각하면 된다
+CASE
+	WHERE 조건1 THEN 결과1
+	WHERE 조건2 THEN 결과2
+	ELSE 결과
+END;
+
+
+MYSQL NULL 함수
+IFNULL
+SELECT ProductName, UnitPrice * (UnitsInStock + IFNULL(UnitsOnOrder, 0))
+FROM Products;
+
+COALESCE(1,2,NULL) -> NULL이 아닌 값 중 첫번째를 리턴한다
+SELECT ProductName, UnitPrice * (UnitsInStock + COALESCE(UnitsOnOrder, 0))
+FROM Products;
+
+MYSQL Comments
+주석이다
+-- -> 한줄 주석
+/**/ -> 여러줄 주석
+
+SOME은 ANY랑 이름만 다를뿐 동일한 기능을 한다
+
+
+
+ 
