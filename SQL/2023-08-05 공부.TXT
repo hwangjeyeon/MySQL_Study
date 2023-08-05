@@ -1,0 +1,309 @@
+MYSQL CREATE DATABASE
+- 새로운 SQL 데이터베이스 생성
+CREATE DATABASE 테이터베이스이름
+ 
+
+MYSQL DROP DATABASE
+- SQL 데이터베이스 삭제
+DROP DATABASE 데이터베이스이름
+
+
+MYSQL CREATE TABLE
+- 데이터베이스 안에 새로운 테이블을 생성한다
+CREATE TABLE 테이블이름 (
+	열1 데이터타입,
+	열2 데이터타입,
+	열3 데이터타입
+);
+예시:
+CREATE TABLE Persons (
+    PersonID int,
+    LastName varchar(255),
+    FirstName varchar(255),
+    Address varchar(255),
+    City varchar(255)
+);
+
+기존에 있는 다른 테이블을 사용하여 테이블 생성 가능
+CREATE TABLE 테이블이름 AS 
+SELECT 열1, 열2
+FROM 기존 테이블이름
+WHERE ;
+
+예시
+CREATE TABLE TestTable AS
+SELECT customername, contactname
+FROM customers;
+
+
+MYSQL DROP TABLE
+기존에 있는 데이터베이스의 테이블을 삭제한다
+DROP TABLE 테이블이름
+
+
+MYSQL TRUNCATE TABLE
+기존에 있는 데이터베이스의 테이블안에있는 데이터를 삭제한다. 테이블은 삭제하지 않는다
+TRUNCATE TABLE 테이블이름
+
+
+MYSQL ALTER TABLE
+- 기존에 있는 테이블의 열을 추가,삭제, 수정한다
+- 기존에 있는 테이블에 다양한 제약을 추가하거나 삭제하는데 사용된다
+
+ALTER TABLE - ADD COLUMN
+ALTER TABLE 테이블이름 ADD 열이름 데이터타입;
+
+ALTER TABLE - DROP COLUMN
+ALTER TABLE 테이블이름 DROP COLUMN 열 이름;
+
+ALTER TABLE - MODIFY COLUMN
+ALTER TABLE 테이블이름 MODIFY COLUMN 열 이름 데이터타입;
+
+MYSQL CONSTRAINTS
+- 제약 조건이다
+- CREATE TABLE할때 제약조건을 구체화할 수 있고, 테이블 생성 후에는 ALTER TABLE을 통해서 제약조건을 만들 수 있다
+CREATE TABLE 테이블 이름 (
+	열1 데이터타입 Constraint,
+	열2 데이터타입 Constraint
+);
+다음과 같은 제약조건이 있다
+- NOT NULL: 열에 NULL이 있을 수 없음을 보장한다
+- UNIQUE: 한 열에 있는 값들은 무조건 서로 다름을 보장한다
+- PRIMARY KEY: NOT NULL이고 중복되지 않는다. 각 행을 고유하게 식별한다
+- FOREIGN KEY: 열결된 두 테이블 사이의 연결 파괴를 막는다
+- CHECK: 구체화된 조건을 만족하는 열의 값을 보장한다
+- DEFAULT: 어떤 값도 구체화되지 않으면 기본값을 설정한다
+- CREATE INDEX: 데이터베이스로부터 만들고 빠르게 데이터 조회하는데 사용하기 위해 사용된다
+
+
+MYSQL NOT NULL Constraint
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255) NOT NULL,
+    Age int
+);
+
+
+MYSQL UNIQUE Constraint
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    UNIQUE (ID)
+);
+UNIQUE와 PRIMARY KEY의 차이점 -> UNIQUE는 다수 존재 가능, PRIMARY KEY는 한개만 존재 가능
+다수 UNIQUE 사용 예:
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    CONSTRAINT UC_Person UNIQUE (ID,LastName)
+);
+- ALTER로 추가 가능
+ALTER TABLE Persons
+ADD UNIQUE (ID);
+다수:
+ALTER TABLE Persons
+ADD CONSTRAINT UC_Person UNIQUE (ID,LastName);
+- DROP으로 삭제 가능
+ALTER TABLE Persons
+DROP INDEX UC_Person;
+
+
+MYSQL PRIMARY KEY Constraint
+- 테이블에 하나만 존재 가능하며, UNIQUE하고 NOT NULL이다
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    PRIMARY KEY (ID)
+);
+다중 PRIMARY KEY 사용 예:
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    CONSTRAINT PK_Person PRIMARY KEY (ID,LastName)
+);
+-> PRIMARY는 한개만 있어야 하는데..?
+-> 1개만 있어야하는 것은 맞다 하지만 하나의 PRIMARY KEY안에 다중 컬럼이 들어갈 수는 있다
+
+이미 만들어져 있는 상태에서 PRIMARY KEY 생성이 안 되어있는 경우:
+ALTER TABLE Persons
+ADD PRIMARY KEY (ID);
+-> 위와 같이 설정 가능
+
+ALTER TABLE Persons
+ADD CONSTRAINT PK_Person PRIMARY KEY (ID,LastName);
+-> 위와 같이 제약조건 이름 설정하고 다수 열 지정 가능
+
+DROP PRIMARY KEY Constraint
+ALTER TABLE Persons
+DROP PRIMARY KEY;
+
+
+MYSQL FOREIGN KEY Constraint
+- 테이블 사이의 연결을 끊는 것을 막는다
+다른 테이블의 PRIMARY KEY를 참고하여 FOREIGN KEY 생성
+
+CREATE TABLE Orders (
+    OrderID int NOT NULL,
+    OrderNumber int NOT NULL,
+    PersonID int,
+    PRIMARY KEY (OrderID),
+    FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+);
+-> Orders의 PersonID는 Persons의 PersonID를 참조하는 FOREIGN KEY이다
+
+CREATE TABLE Orders (
+    OrderID int NOT NULL,
+    OrderNumber int NOT NULL,
+    PersonID int,
+    PRIMARY KEY (OrderID),
+    CONSTRAINT FK_PersonOrder FOREIGN KEY (PersonID)
+    REFERENCES Persons(PersonID)
+);
+-> 다수행 지정을 위해서는 다음과 같이도 가능
+
+FOREGIN KEY ON ALTER TABLE
+ALTER TABLE Orders
+ADD FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+
+ALTER TABLE Orders
+ADD CONSTRAINT FK_PersonOrder
+FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
+-> 제약조건 이름 지정과 다수행 지정을 위해서 위과 같이도 같음
+
+DROP FOREIGN KEY Constraint
+ALTER TABLE Orders
+DROP FOREIGN KEY FK_PersonOrder;
+-> FOREIGN KEY 삭제
+
+
+MYSQL CHECK Constraint
+WHERE이나 HAVING이랑 비슷함
+
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    CHECK (Age>=18)
+);
+
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    City varchar(255),
+    CONSTRAINT CHK_Person CHECK (Age>=18 AND City='Sandnes')
+);
+-> 다수 열 지정 가능
+
+CHECK on ALTER TABLE
+ALTER TABLE Persons
+ADD CHECK (Age>=18);
+
+ALTER TABLE Persons
+ADD CONSTRAINT CHK_PersonAge CHECK (Age>=18 AND City='Sandnes');
+
+DROP a CHECK Constraint
+ALTER TABLE Persons
+DROP CHECK CHK_PersonAge;
+
+
+MYSQL DEFAULT
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    City varchar(255) DEFAULT 'Sandnes'
+);
+
+CREATE TABLE Orders (
+    ID int NOT NULL,
+    OrderNumber int NOT NULL,
+    OrderDate date DEFAULT CURRENT_DATE()
+);
+-> 시스템 함수를 사용할 수 있음
+-> 현재 날짜 반환
+
+DEFAULT on ALTER TABLE
+ALTER TABLE Persons
+ALTER City SET DEFAULT 'Sandnes';
+
+DROP a DEFAULT Constraint
+ALTER TABLE Persons
+ALTER City DROP DEFAULT;
+
+
+MYSQL CREATE INDEX
+- 테이블에 인덱스를 만든다
+- 인덱스는 데이터베이스로부터 데이터를 검색하는데 더 빠르게 만들어준다
+CREATE INDEX 인덱스 이름
+ON 테이블 이름 (열1, 열2, 열3)
+
+CREATE UNIQUE INDEX 인덱스 이름
+ON 테이블 이름 (열1, 열2, 열3)
+
+DROP INDEX
+ALTER TABLE table_name
+DROP INDEX index_name;
+
+
+MySQL AUTO INCREMENT Field
+- 새로운 값이 추가될 때 자동으로 증가하는 것
+CREATE TABLE Persons (
+    Personid int NOT NULL AUTO_INCREMENT,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    PRIMARY KEY (Personid)
+);
+-> INSERT보낼때마다 자동으로 값이 증가
+
+ALTER TABLE Persons AUTO_INCREMENT=100;
+-> 이런식으로 쵝화 가능
+
+
+MYSQL DATES
+DATE 데이터 타입
+- DATE - format YYYY-MM-DD
+- DATETIME - format: YYYY-MM-DD HH:MI:SS
+- TIMESTAMP - format: YYYY-MM-DD HH:MI:SS
+- YEAR - format YYYY or YY
+
+-> 형식에 맞게 조회하지 않으면 결과가 나오지 않는다
+
+
+MYSQL VIEWS
+- 가상의 테이블이다
+- 진짜 테이블 같이 행과 열을 가지고 있다
+CREATE VIEW 뷰이름 AS
+SELECT 찾는 열.
+FROM 테이블 이름
+WHERE 조건;
+-> 뷰 생성 방법
+
+뷰 생성 후에 다음과 같이 조회할 수 있다
+SELECT * FROM [Brazil Customers];
+
+뷰 업데이트 방법 - CREATE OR REPLACE VIEW
+CREATE OR REPLACE VIEW view_name AS
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;
+
+뷰 삭제 방법:
+DROP VIEW 뷰이름
+
+
+
+
